@@ -4,10 +4,4 @@ fetch("/api/productos-test").then(async(data) => {
     
         socket.emit('client:product', response)
 });
-
- fetch("/").then(async(session) => {
-   
-
-   
-});
  

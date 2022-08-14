@@ -1,15 +1,22 @@
 import { faker } from '@faker-js/faker'
-import express from 'express'
+import express, {json} from 'express'
 import { Router } from 'express'
 
 const app = express()
 const router = Router()
-app.use(express.json())
+app.use(json())
 app.use(express.urlencoded({ extended: true }))
 
-router.get('/', (req, res) => {
-    
-    res.redirect('/login')
+
+
+router.post('/login', async (req, res) => {
+    const {inpUsuario} = req.body
+    req.session.user = inpUsuario
+    //console.log(req.session.user)
+    //res.json(req.session.user)
+    //sessionActiva = req.session.user
+    res.redirect('/')
+    return
 })
 
 router.get('/api/productos-test', (req, res) => {

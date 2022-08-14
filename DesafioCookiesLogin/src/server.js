@@ -11,22 +11,11 @@ const io = new Server(expressServer);
 import router from '../routes/indexrouts.js';
 import { schema, normalize } from 'normalizr';
 import util from 'util';
-
 import cookieParser from "cookie-parser"
 import session from "express-session"
 import MongoStore from "connect-mongo"
+const sessionActiva = "";
 
-function print(objeto)
-{
-    console.log(util.inspect(objeto,false,12,true))
-}
-
-
-let ProductosDB = []
-let messagesArray = []
-fs.writeFileSync(`Messages/appMensajes.txt`,'')
-app.use(express.static(path.join(__dirname, '../public')))
-app.use('/', router)
 const mongoOptions = {useNewUrlParser: true, useUnifiedTopology:true}
 app.use(cookieParser())
 app.use(session({
@@ -35,18 +24,32 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie:{
-        maxAge:20000
+        maxAge:10000
     }
 }))
+
+function print(objeto)
+{
+    console.log(util.inspect(objeto,false,12,true))
+}
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+
+let ProductosDB = []
+let messagesArray = []
+fs.writeFileSync(`Messages/appMensajes.txt`,'')
+app.use(express.static(path.join(__dirname, '../public')))
+app.use('/', router)
 io.on('connection', async socket => {
     //console.log(`Nuevo usuario conectado ${socket.id}`)
     socket.on('client:product', async productInfo => {
         ProductosDB= productInfo
         //ProductosDB = await qryRead.ReadProductos()
-        io.emit('server:productos', ProductosDB)
+        io.emit('server:productos', {ProductosDB,sessionActiva})
             //console.log('si llegue primero', ProductosDB)
     })
-    socket.emit('server:productos', ProductosDB)
+    socket.emit('server:productos', {ProductosDB,sessionActiva})
         //Socket Mensajes
     socket.emit('server:mensajes', messagesArray)
     socket.on('client:menssage', async messageInfo => {

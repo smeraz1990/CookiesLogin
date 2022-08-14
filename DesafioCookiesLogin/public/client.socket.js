@@ -1,5 +1,6 @@
 const socket = io()
 const ProductosForm = document.querySelector('#ProductosForm')
+const LoginForm = document.querySelector('#Login')
 const titleInput = document.querySelector('#title')
 const priceInput = document.querySelector('#price')
 const imgPool = document.querySelector('#thumbnail')
@@ -16,20 +17,35 @@ const messageInput = document.querySelector('#messageInput')
 let entendimiento=0
 
 //Funciones para Productos
-function renderProductos(productos) {
-    fetch('./productos.hbs').then(response => {
-        response.text().then((plantilla) => {
-            const template = Handlebars.compile(plantilla);
-            let html = template({ productos });
-            $("#gridProductos tbody").html(html)
-            titleInput.value = ""
-            priceInput.value = ""
-            imgPool.value = ""
+function renderProductos  (productos) {
+    
+    console.log(productos.sessionActiva)
+    console.log(productos.ProductosDB)
+
+    if(productos.sessionActiva != "")
+    {
+        productos = productos.ProductosDB
+        $('.divSessionActiva').show()
+        $('.divlogin').hide()
+        fetch('./productos.hbs').then(response => {
+            response.text().then((plantilla) => {
+                const template = Handlebars.compile(plantilla);
+                let html = template({ productos });
+                $("#gridProductos tbody").html(html)
+                titleInput.value = ""
+                priceInput.value = ""
+                imgPool.value = ""
+            })
         })
-    })
+    }
+    else{
+        $('.divSessionActiva').hide()
+        $('.divlogin').show()
+    }
 }
 
 socket.on('server:productos', productos => {
+    console.log(productos)
     renderProductos(productos)
 })
 
@@ -46,10 +62,26 @@ ProductosForm.addEventListener('submit', event => {
     sendProductos(productInfo)
 })
 
+// LoginForm.addEventListener('submit', event => {
+//     event.preventDefault()
 
-function sendProductos(productInfo) {
-    socket.emit('client:product', productInfo)
-}
+//     const loginInfo = {
+//         userLogin: inpUsuario.value,
+//     }
+
+//     sendLogin(loginInfo)
+// })
+
+// function sendLogin(loginInfo) {
+//     socket.emit('client:login', loginInfo)
+// }
+
+
+// function sendProductos(productInfo) {
+//     socket.emit('client:product', productInfo)
+// }
+
+
 
 //Funciones para mensajeria
 function sendMessage(messageInfo) {
